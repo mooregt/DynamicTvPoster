@@ -1,0 +1,14 @@
+{
+  "name": "dynamic-tv-poster",
+  "version": "1.0.0",
+  "description": "Displays poster for most recent watched TV show",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "George Moore",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
