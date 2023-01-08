@@ -7,6 +7,7 @@ const path = require('path')
 const needle = require('needle')
 const cheerio = require('cheerio')
 const urlBase = 'https://www.tvtime.com'
+const config = require('./config.json');
 
 function getCookies () {
   const setting = require(path.join(__dirname, 'access.json'))
@@ -195,11 +196,7 @@ function login (user, passw, force = false) {
 
 
 function getTvTimeData(){
-    let tvtime = require('tvtime-api');
-    const username = "mooregt";
-    const password = "";
-    
-    login("mooregt", "");
+    login(config.username, config.password);
     
     let shows = getShows();
 
