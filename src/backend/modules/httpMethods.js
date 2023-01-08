@@ -1,11 +1,24 @@
 const needle = require('needle')
 const user = require('./user.js')
+const path = require('path')
 
 const urlBase = 'https://www.tvtime.com'
 
+function getCookies () {
+  const setting = require(path.join(__dirname, 'access.json'))
+  let cookies = {}
+  if (setting.tvstRemember.length > 0) {
+    cookies = {
+      tvstRemember: setting.tvstRemember,
+      symfony: setting.symfony
+    }
+  }
+  return cookies
+}
+
 function get (urlPath, data) {
   const url = urlBase + urlPath
-  const cookies = { cookies: user.getCookies }
+  const cookies = { cookies: getCookies() }
 
   return new Promise((resolve, reject) => {
     needle('get', url, data, cookies)
@@ -42,4 +55,4 @@ function post (urlPath, data) {
   })
 }
 
-module.exports = { get, post }
+module.exports = { getCookies, get, post }

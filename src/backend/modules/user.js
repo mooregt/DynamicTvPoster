@@ -2,18 +2,6 @@ const fs = require('fs')
 const path = require('path')
 const httpMethods = require('./httpMethods.js')
 
-function getCookies () {
-  const setting = require(path.join(__dirname, 'access.json'))
-  let cookies = {}
-  if (setting.tvstRemember.length > 0) {
-    cookies = {
-      tvstRemember: setting.tvstRemember,
-      symfony: setting.symfony
-    }
-  }
-  return cookies
-}
-
 async function setCookie (callback, obj, remove = false) {
   let setting = require(path.join(__dirname, 'access.json'))
   setting = Object.assign(setting, obj)
@@ -49,7 +37,7 @@ function removeAccess () {
 }
 
 function isLogin () {
-  if (getCookies().tvstRemember !== undefined) {
+  if (httpMethods.getCookies().tvstRemember !== undefined) {
     return true
   }
   return false
@@ -73,4 +61,4 @@ function login (user, passw, force = false) {
   })
 }
 
-module.exports = { getCookies, setCookie, getUser, removeAccess, isLogin, login }
+module.exports = { setCookie, getUser, removeAccess, isLogin, login }
