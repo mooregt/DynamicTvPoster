@@ -1,13 +1,13 @@
+const config = require('./config.json');
+const cheerio = require('cheerio')
 const express = require('express')
+const fs = require('fs')
+const needle = require('needle')
+const path = require('path')
+
 const app = express()
 const port = 3000
-
-const fs = require('fs')
-const path = require('path')
-const needle = require('needle')
-const cheerio = require('cheerio')
 const urlBase = 'https://www.tvtime.com'
-const config = require('./config.json');
 
 function getCookies () {
   const setting = require(path.join(__dirname, 'access.json'))
@@ -159,60 +159,59 @@ function login (user, passw, force = false) {
     })
   }
 
-  function getShows () {
-    const listShows = []
+function getShows () {
+  const listShows = []
   
-    return new Promise((resolve, reject) => {
-      if (!isLogin()) {
-        resolve('User no login')
-        return
-      }
-      const userId = getUser()
-      console.info("logged in")
-      get(`/en/user/${userId}/profile`)
-        .then(resp => {
-          const bodyParse = cheerio.load(resp.body)
+  return new Promise((resolve, reject) => {
+    if (!isLogin()) {
+      resolve('User no login')
+      return
+    }
+    const userId = getUser()
+    console.info("logged in")
+    get(`/en/user/${userId}/profile`)
+      .then(resp => {
+        const bodyParse = cheerio.load(resp.body)
   
-          bodyParse('ul.shows-list li.first-loaded')
-            .each((index, item) => {
-              const li = cheerio.load(item)
-              const linkSerie = li('div.poster-details a')
-              const imgSerie = li('div.image-crop img')
-              listShows.push({
-                id: linkSerie.attr('href').split('/')[3],
-                name: linkSerie.text().trim(),
-                img: imgSerie.attr('src')
-              })
+        bodyParse('ul.shows-list li.first-loaded')
+          .each((index, item) => {
+            const li = cheerio.load(item)
+            const linkSerie = li('div.poster-details a')
+            const imgSerie = li('div.image-crop img')
+            listShows.push({
+              id: linkSerie.attr('href').split('/')[3],
+              name: linkSerie.text().trim(),
+              img: imgSerie.attr('src')
             })
-            resolve(listShows)
+          })
+          resolve(listShows)
   
-        })
-        .catch(reject)
-    })
-  }
+      })
+      .catch(reject)
+  })
+}
 
 
 function getTvTimeData(){
-    return new Promise((resolve, reject) => {
-        login(config.username, config.password)
-        .then(function ()
-        {
-            let shows = getShows()
-            shows.then(function (result) {
-                resolve(result)
-            })
-        })
+  return new Promise((resolve, reject) => {
+    login(config.username, config.password)
+    .then(function ()
+    {
+      let shows = getShows()
+      shows.then(function (result) {
+        resolve(result)
       })
+    })
+  })
 }
 
 app.get('/', (req, res) => {
-    let shows = getTvTimeData()
+  let shows = getTvTimeData()
 
-    shows.then(function(result) {
-        console.info(result)
-        res.send(result[0])
-    })
-    
+  shows.then(function(result) {
+    console.info(result)
+    res.send(result[0])
+  })  
 })
 
 app.listen(port, () => {
