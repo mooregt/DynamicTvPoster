@@ -9,7 +9,8 @@
   "author": "George Moore",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
     "express": "^4.18.2",
-    "tvtime-api": "^0.3.0"
+    "needle": "^3.2.0"
   }
 }
