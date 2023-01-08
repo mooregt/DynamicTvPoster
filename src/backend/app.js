@@ -169,9 +169,8 @@ function login (user, passw, force = false) {
       }
       const userId = getUser()
       console.info("logged in")
-      get('/en/user/66473177/profile')
+      get(`/en/user/${userId}/profile`)
         .then(resp => {
-        //   console.info(resp)
           const bodyParse = cheerio.load(resp.body)
   
           bodyParse('ul.shows-list li.first-loaded')
@@ -179,16 +178,14 @@ function login (user, passw, force = false) {
               const li = cheerio.load(item)
               const linkSerie = li('div.poster-details a')
               const imgSerie = li('div.image-crop img')
-                // console.info(linkSerie)
               listShows.push({
                 id: linkSerie.attr('href').split('/')[3],
                 name: linkSerie.text().trim(),
                 img: imgSerie.attr('src')
               })
             })
-            console.log(listShows[0].name)
+            resolve(listShows)
   
-        //   resolve(listShows)
         })
         .catch(reject)
     })
@@ -196,15 +193,26 @@ function login (user, passw, force = false) {
 
 
 function getTvTimeData(){
-    login(config.username, config.password);
-    
-    let shows = getShows();
-
-    return shows;
+    return new Promise((resolve, reject) => {
+        login(config.username, config.password)
+        .then(function ()
+        {
+            let shows = getShows()
+            shows.then(function (result) {
+                resolve(result)
+            })
+        })
+      })
 }
 
 app.get('/', (req, res) => {
-  res.send(getTvTimeData());
+    let shows = getTvTimeData()
+
+    shows.then(function(result) {
+        console.info(result)
+        res.send(result[0])
+    })
+    
 })
 
 app.listen(port, () => {
