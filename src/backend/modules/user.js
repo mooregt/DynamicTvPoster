@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const httpMethods = require('./httpMethods.js')
 
 function getCookies () {
   const setting = require(path.join(__dirname, 'access.json'))
@@ -61,7 +62,7 @@ function login (user, passw, force = false) {
       return
     }
   
-    post('/signin', {
+    httpMethods.post('/signin', {
       username: user,
       password: passw
     })

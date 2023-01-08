@@ -4,50 +4,12 @@ const express = require('express')
 const fs = require('fs')
 const needle = require('needle')
 const path = require('path')
-const user = require('./user.js')
+const user = require('./modules/user.js')
+const httpMethods = require('./modules/httpMethods.js')
 
 const app = express()
 const port = 3000
 const urlBase = 'https://www.tvtime.com'
-
-function get (urlPath, data) {
-  const url = urlBase + urlPath
-  const cookies = { cookies: user.getCookies() }
-
-  return new Promise((resolve, reject) => {
-    needle('get', url, data, cookies)
-      .then(resp => {
-        if (resp.cookies && resp.cookies.tvstRemember === 'deleted') {
-          return user.removeAccess()
-            .then(resolve)
-        }
-
-        resolve(resp)
-      })
-      .catch(reject)
-  })
-}
-
-function post (urlPath, data) {
-  const url = urlBase + urlPath
-  const cookies = { cookies: user.getCookies() }
-
-  return new Promise((resolve, reject) => {
-    needle('post', url, data, cookies)
-      .then(resp => {
-        const cookies = resp.cookies
-
-        if (cookies.tvstRemember) {
-          user.setCookie(d => {
-            resolve(d)
-          }, { tvstRemember: cookies.tvstRemember, symfony: cookies.symfony })
-        } else {
-          resolve('')
-        }
-      })
-      .catch(reject)
-  })
-}
 
 function getShows () {
   const listShows = []
@@ -59,7 +21,7 @@ function getShows () {
     }
     const userId = user.getUser()
     console.info("logged in")
-    get(`/en/user/${userId}/profile`)
+    httpMethods.get(`/en/user/${userId}/profile`)
       .then(resp => {
         const bodyParse = cheerio.load(resp.body)
   
